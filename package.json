@@ -1,0 +1,17 @@
+{
+  "name": "personal-agents",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Michael's personal agents. Separate from pioNox — this one is for me, not for clients.",
+  "scripts": {
+    "spending": "node spending/bot.mjs",
+    "spending:dev": "node --watch spending/bot.mjs",
+    "test": "for f in _*test.mjs; do echo \"== $f ==\"; node \"$f\" || exit 1; done"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "discord.js": "^14.26.4",
+    "dotenv": "^16.4.5"
+  }
+}
