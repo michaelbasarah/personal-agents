@@ -8,6 +8,7 @@ holds personal data. Nothing here reaches into `~/pioNox`; the shared pieces wer
 | | |
 |---|---|
 | `spending/` | Log what you spent in Discord → it lands in a Google Sheet |
+| `_doctor.mjs` | `npm run doctor` — walks the credential chain and tells you which link is broken |
 | `lib/` | Shared plumbing: Google service-account auth, Sheets I/O, structured logging |
 
 Borrowed from pioNox (`Services/ai-employees/app/`): `google.mjs` verbatim, `log.mjs` verbatim, and
@@ -63,10 +64,15 @@ date, so pivot tables and charts work without cleanup.
 ```bash
 cp .env.example .env    # then fill it in
 npm install
+npm run doctor          # checks all four consoles and names the one that's wrong
 node _sheetstest.mjs    # writes a row, reads it, deletes it — proves the whole chain
 node _parsetest.mjs     # ~7 real Gemini calls, checks the shorthand parsing
 npm run spending
 ```
+
+`npm run doctor` exists because these four services fail in each other's clothing: a missing
+Message Content intent looks like a dead bot, an unshared sheet looks like a bad service-account
+key. It runs the chain in order and prints the next action, not a stack trace.
 
 ### Keeping it running
 

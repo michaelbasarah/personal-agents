@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Michael's personal agents. Separate from pioNox — this one is for me, not for clients.",
   "scripts": {
+    "doctor": "node _doctor.mjs",
     "spending": "node spending/bot.mjs",
     "spending:dev": "node --watch spending/bot.mjs",
     "test": "for f in _*test.mjs; do echo \"== $f ==\"; node \"$f\" || exit 1; done"
