@@ -8,6 +8,7 @@ holds personal data. Nothing here reaches into `~/pioNox`; the shared pieces wer
 | | |
 |---|---|
 | `spending/` | Log what you spent in Discord → it lands in a Google Sheet |
+| [_canvas-sync_](https://github.com/michaelbasarah/canvas-sync) | Nightly local archive of Canvas courses — files, assignments, due dates. Own repo |
 | `_doctor.mjs` | `npm run doctor` — walks the credential chain and tells you which link is broken |
 | `lib/` | Shared plumbing: Google service-account auth, Sheets I/O, structured logging |
 
