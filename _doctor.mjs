@@ -27,11 +27,29 @@ section("env");
 const REQUIRED = {
   DISCORD_TOKEN: "Developer Portal → your app → Bot → Reset Token",
   GEMINI_API_KEY: "aistudio.google.com/apikey → Create API key",
-  SPEND_SHEET_ID: "the long id in your sheet's URL: docs.google.com/spreadsheets/d/<THIS>/edit",
 };
 for (const [key, fix] of Object.entries(REQUIRED)) {
   if (process.env[key]) pass(key, `${process.env[key].length} chars`);
   else fail(`${key} is empty`, fix);
+}
+
+// The ledger can be addressed two ways: a literal sheet id, or a name looked up inside the shared
+// Drive folder. Either is fine; neither is not.
+if (process.env.SPEND_SHEET_ID) {
+  const id = process.env.SPEND_SHEET_ID;
+  if (/^https?:/.test(id)) {
+    fail("SPEND_SHEET_ID is a full URL, not an id",
+         "keep only the part between /d/ and /edit — 44 characters, no slashes");
+  } else if (id.length < 30) {
+    fail(`SPEND_SHEET_ID looks too short (${id.length} chars)`, "a real sheet id is ~44 characters");
+  } else {
+    pass("SPEND_SHEET_ID", `${id.length} chars`);
+  }
+} else if (process.env.AGENTS_DRIVE_FOLDER_ID) {
+  pass("SPEND_SHEET_ID empty", `will look up "${process.env.SPEND_SHEET_NAME || "Spending"}" in the Drive folder`);
+} else {
+  fail("neither SPEND_SHEET_ID nor AGENTS_DRIVE_FOLDER_ID is set",
+       "set one: the sheet's id from its URL, or the shared folder's id from drive.google.com/drive/folders/<THIS>");
 }
 if (process.env.SPEND_USER_IDS?.trim()) {
   const ids = process.env.SPEND_USER_IDS.split(",").map((s) => s.trim()).filter(Boolean);
@@ -79,21 +97,55 @@ if (clientEmail) {
   }
 }
 
+// ---------------------------------------------------------------- 3b. the drive folder
+
+let resolvedSheetId = process.env.SPEND_SHEET_ID || null;
+if (clientEmail && process.env.AGENTS_DRIVE_FOLDER_ID) {
+  section("google drive folder");
+  try {
+    const { describeFolder, listFiles, SHEET_MIME } = await import("./lib/drive.mjs");
+    const folder = await describeFolder();
+    pass("folder reachable", `"${folder.name}"`);
+
+    const sheets = await listFiles({ mimeType: SHEET_MIME });
+    if (sheets.length) pass(`${sheets.length} spreadsheet(s) in it`, sheets.map((f) => f.name).join(", "));
+    else warn("no spreadsheets in the folder yet", "drag your Spending sheet into it");
+
+    if (!resolvedSheetId) {
+      const want = process.env.SPEND_SHEET_NAME || "Spending";
+      const hit = sheets.find((f) => f.name === want);
+      if (hit) { resolvedSheetId = hit.id; pass(`resolved "${want}" by name`, hit.id); }
+      else fail(`no spreadsheet named "${want}" in the folder`,
+                `rename it to "${want}", or set SPEND_SHEET_NAME to one of the names above`);
+    }
+  } catch (e) {
+    if (e.status === 403 || e.status === 404) {
+      fail("the service account can't see that folder",
+           `share the FOLDER with ${clientEmail} as an Editor, and check AGENTS_DRIVE_FOLDER_ID`);
+    } else if (/Drive API has not been used|accessNotConfigured|SERVICE_DISABLED/.test(e.message)) {
+      fail("the Drive API isn't enabled on this GCP project",
+           "APIs & Services → Library → Google Drive API → Enable, then wait ~1 min");
+    } else {
+      fail(`drive check failed: ${e.message.slice(0, 200)}`, "check AGENTS_DRIVE_FOLDER_ID is the folder's id");
+    }
+  }
+}
+
 // ---------------------------------------------------------------- 4. the sheet
 
-if (clientEmail && process.env.SPEND_SHEET_ID) {
+if (clientEmail && resolvedSheetId) {
   section("google sheet");
   const tab = process.env.SPEND_SHEET_TAB || "Spending";
   try {
     const { getAccessToken } = await import("./lib/google.mjs");
     const token = await getAccessToken();
     const resp = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${process.env.SPEND_SHEET_ID}?fields=properties.title,sheets.properties.title`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${resolvedSheetId}?fields=properties.title,sheets.properties.title`,
       { headers: { Authorization: `Bearer ${token}` } },
     );
     if (resp.status === 403) {
       fail("403 — the service account cannot see the sheet",
-           `share the sheet with ${clientEmail} as an EDITOR. This is the step everyone misses.`);
+           `share it (or the folder it's in) with ${clientEmail} as an EDITOR. This is the step everyone misses.`);
     } else if (resp.status === 404) {
       fail("404 — no sheet with that id", "re-copy SPEND_SHEET_ID from the sheet's URL");
     } else if (!resp.ok) {

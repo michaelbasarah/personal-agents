@@ -15,7 +15,7 @@
 import "dotenv/config";
 import { Client, GatewayIntentBits, ActivityType } from "discord.js";
 import { log } from "../lib/log.mjs";
-import { appendSpend, readSpendRows, deleteRow } from "../lib/sheets.mjs";
+import { appendSpend, readSpendRows, deleteRow } from "./ledger.mjs";
 import { parseExpense, todayIn, CATEGORIES } from "./parse.mjs";
 
 const TZ = process.env.SPEND_TZ || "Asia/Jakarta";

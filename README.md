@@ -54,12 +54,15 @@ date, so pivot tables and charts work without cleanup.
 - Make a `#spending` channel. In Discord: Settings → Advanced → Developer Mode on, then right-click
   the channel and yourself to copy both IDs.
 
-**2. Google Sheet**
-- New sheet, rename the first tab to `Spending`. Leave it empty — the header writes itself.
-- [GCP console](https://console.cloud.google.com) → enable the **Google Sheets API** → a service
-  account → Keys → Add Key → JSON. Save it outside this folder (`~/.config/personal-agents/sa.json`).
-- **Share the sheet with the service account's `client_email` as an Editor.** This is the step
-  everyone forgets; skipping it produces a 403 that looks like a bad key.
+**2. Google Drive + Sheet**
+- Make a Drive folder (`Personal Agents`). New sheet inside it, first tab renamed to `Spending`.
+  Leave the sheet empty — the header writes itself.
+- [GCP console](https://console.cloud.google.com) → enable the **Google Sheets API** *and* the
+  **Google Drive API** → a service account → Keys → Add Key → JSON. Save it outside this repo
+  (`~/.config/personal-agents/sa.json`).
+- **Share the FOLDER with the service account's `client_email` as an Editor.** This is the step
+  everyone forgets; skipping it produces a 403 that looks like a bad key. Sharing the folder rather
+  than the file is what lets the next agent skip this whole section.
 
 **3. Wire it up**
 ```bash

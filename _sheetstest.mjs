@@ -8,10 +8,10 @@
  * Run: node _sheetstest.mjs
  */
 import "dotenv/config";
-import { appendSpend, readSpendRows, deleteRow } from "./lib/sheets.mjs";
+import { appendSpend, readSpendRows, deleteRow } from "./spending/ledger.mjs";
 
-if (!process.env.SPEND_SHEET_ID) {
-  console.log("… skipped: no SPEND_SHEET_ID");
+if (!process.env.SPEND_SHEET_ID && !process.env.AGENTS_DRIVE_FOLDER_ID) {
+  console.log("… skipped: set SPEND_SHEET_ID, or AGENTS_DRIVE_FOLDER_ID to find the sheet by name");
   process.exit(0);
 }
 
