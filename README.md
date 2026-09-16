@@ -10,11 +10,27 @@ holds personal data. Nothing here reaches into `~/pioNox`; the shared pieces wer
 | `spending/` | Log what you spent in Discord → it lands in a Google Sheet |
 | [_canvas-sync_](https://github.com/michaelbasarah/canvas-sync) | Nightly local archive of Canvas courses — files, assignments, due dates. Own repo |
 | `_doctor.mjs` | `npm run doctor` — walks the credential chain and tells you which link is broken |
-| `lib/` | Shared plumbing: Google service-account auth, Sheets I/O, structured logging |
+| `lib/` | Shared plumbing: service-account auth, Drive discovery, Sheets I/O, structured logging |
 
-Borrowed from pioNox (`Services/ai-employees/app/`): `google.mjs` verbatim, `log.mjs` verbatim, and
-the *shape* of `discord.mjs` (channel routing, per-channel serialization, chunking, restart posture)
-and `sheets.mjs` (raw REST, no `googleapis` dependency).
+`lib/` is deliberately generic — no agent's sheet id, tab name or column layout lives in it. The
+spending agent's opinions (its fixed header, its `!undo` semantics) sit in `spending/ledger.mjs`,
+which is the template for the next agent: bring a header, get the plumbing free.
+
+### One folder, many agents
+
+The service account isn't given one spreadsheet. It's given one **Drive folder**, shared as Editor,
+and Drive permissions inherit — so every sheet dropped in there afterwards is reachable with no
+further trips to a console. `lib/drive.mjs` finds files in it by name, which is why a new agent
+needs a filename rather than another round of setup.
+
+Set `AGENTS_DRIVE_FOLDER_ID` to that folder. `SPEND_SHEET_ID` then becomes optional: leave it blank
+and the ledger resolves `SPEND_SHEET_NAME` (default `Spending`) inside the folder instead.
+
+Borrowed from pioNox (`Services/ai-employees/app/`): `google.mjs` verbatim, and the *shape* of
+`discord.mjs` (channel routing, per-channel serialization, chunking, restart posture) and
+`sheets.mjs` (raw REST, no `googleapis` dependency). `sheets.mjs` has since been rewritten here to
+take a sheet target rather than read a fixed env var, and `log.mjs` was trimmed of client-specific
+examples — this repo is public.
 
 ---
 
