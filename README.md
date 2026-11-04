@@ -32,6 +32,21 @@ Borrowed from pioNox (`Services/ai-employees/app/`): `google.mjs` verbatim, and 
 take a sheet target rather than read a fixed env var, and `log.mjs` was trimmed of client-specific
 examples — this repo is public.
 
+## Other projects
+
+Standalone repos, most of them pulled out of pioNox and made generic:
+
+| Repo | What it is |
+|---|---|
+| [pionox-case-study](https://github.com/michaelbasarah/pionox-case-study) | Write-up of pioNox, a WhatsApp AI receptionist, plus a knowledge-base coverage dataset |
+| [wa-exec-assistant](https://github.com/michaelbasarah/wa-exec-assistant) | WhatsApp AI secretary: calendar, tasks, notes, reminders, sales-update intake |
+| [llm-bot-eval-kit](https://github.com/michaelbasarah/llm-bot-eval-kit) | Regression tests for an LLM chatbot: persona evals, injection probes, smoke gates |
+| [gemini-toolkit](https://github.com/michaelbasarah/gemini-toolkit) | RAG over SQLite embeddings, a cost ledger, structured menu extraction |
+| [ig-swipe-analyzer](https://github.com/michaelbasarah/ig-swipe-analyzer) | Instagram post or reel to a scored breakdown in a Google Sheet |
+| [node-edge-kit](https://github.com/michaelbasarah/node-edge-kit) | Zero-dependency hardening for a single-box Node app |
+| [claude-code-multiterminal-kit](https://github.com/michaelbasarah/claude-code-multiterminal-kit) | Running several Claude Code terminals in parallel without collisions |
+| [piohub](https://github.com/michaelbasarah/piohub) | Full-stack student teammate-matching platform |
+
 ---
 
 ## Spending agent
