@@ -4,3 +4,25 @@ node_modules/
 secrets/
 *.json.key
 service-account*.json
+
+# Secrets: never commit
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+token.json
+cookies*.txt
+*.cookies
+# Local environments, caches and OS junk
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+~$*
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
